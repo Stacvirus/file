@@ -1,64 +1,109 @@
-let selectedPdfPath = null;
-let selectedTxtPath = null;
+let selectedPdfPaths = [];
+let selectedXmlPath = null;
 
 // Elements
-const pdfPathElement = document.getElementById('pdf-path');
-const txtPathElement = document.getElementById('txt-path');
-const selectPdfBtn = document.getElementById('select-pdf');
-const selectTxtBtn = document.getElementById('select-txt');
+const pdfPathsElement = document.getElementById('pdf-paths');
+const xmlPathElement = document.getElementById('xml-path');
+const selectPdfsBtn = document.getElementById('select-pdfs');
+const selectXmlBtn = document.getElementById('select-xml');
 const renameBtn = document.getElementById('rename-btn');
 const resultElement = document.getElementById('result');
 
 // Event listeners
-selectPdfBtn.addEventListener('click', async () => {
-    const path = await window.electron.selectPdf();
-    if (path) {
-        selectedPdfPath = path;
-        pdfPathElement.textContent = path;
+selectPdfsBtn.addEventListener('click', async () => {
+    const paths = await window.electron.selectPdfs();
+    if (paths && paths.length > 0) {
+        selectedPdfPaths = paths;
+        updatePdfPathsList();
         checkEnableRenameButton();
     }
 });
 
-selectTxtBtn.addEventListener('click', async () => {
-    const path = await window.electron.selectTxt();
+selectXmlBtn.addEventListener('click', async () => {
+    const path = await window.electron.selectXml();
     if (path) {
-        selectedTxtPath = path;
-        txtPathElement.textContent = path;
+        selectedXmlPath = path;
+        xmlPathElement.textContent = path;
         checkEnableRenameButton();
     }
 });
 
 renameBtn.addEventListener('click', async () => {
-    if (selectedPdfPath && selectedTxtPath) {
+    if (selectedPdfPaths.length > 0 && selectedXmlPath) {
         renameBtn.disabled = true;
         renameBtn.textContent = 'Processing...';
 
-        const result = await window.electron.renamePdf(selectedPdfPath, selectedTxtPath);
+        const result = await window.electron.renamePdfs(selectedPdfPaths, selectedXmlPath);
 
         if (result.success) {
-            resultElement.innerHTML = `
+            let successHtml = `
         <div class="success">
-          <p>${result.message}</p>
-          <p>Original: ${result.oldPath}</p>
-          <p>New: ${result.newPath}</p>
-        </div>
+          <h3>${result.message}</h3>
+          <h4>Successfully renamed files:</h4>
+          <ul class="result-list">
       `;
+
+            result.results.forEach(item => {
+                successHtml += `
+          <li>
+            <strong>${item.oldName}</strong> → <strong>${item.newName}</strong>
+          </li>
+        `;
+            });
+
+            successHtml += `</ul>`;
+
+            if (result.errors.length > 0) {
+                successHtml += `
+          <h4>Errors:</h4>
+          <ul class="error-list">
+        `;
+
+                result.errors.forEach(error => {
+                    successHtml += `<li>${error}</li>`;
+                });
+
+                successHtml += `</ul>`;
+            }
+
+            successHtml += `</div>`;
+            resultElement.innerHTML = successHtml;
         } else {
             resultElement.innerHTML = `
         <div class="error">
-          <p>${result.message}</p>
+          <h3>${result.message}</h3>
+          <ul class="error-list">
+            ${result.errors.map(err => `<li>${err}</li>`).join('')}
+          </ul>
         </div>
       `;
         }
 
         renameBtn.disabled = false;
-        renameBtn.textContent = 'Rename PDF';
+        renameBtn.textContent = 'Rename PDFs';
     }
 });
 
-function checkEnableRenameButton() {
-    renameBtn.disabled = !(selectedPdfPath && selectedTxtPath);
+function updatePdfPathsList() {
+    if (selectedPdfPaths.length === 0) {
+        pdfPathsElement.innerHTML = '<span class="text-muted">None</span>';
+        return;
+    }
+
+    let html = '<ul class="file-list">';
+    selectedPdfPaths.forEach(path => {
+        html += `<li>${path}</li>`;
+    });
+    html += '</ul>';
+    html += `<p class="file-count">${selectedPdfPaths.length} file(s) selected</p>`;
+
+    pdfPathsElement.innerHTML = html;
 }
 
-// Initialize button state
+function checkEnableRenameButton() {
+    renameBtn.disabled = !(selectedPdfPaths.length > 0 && selectedXmlPath);
+}
+
+// Initialize
+updatePdfPathsList();
 checkEnableRenameButton();

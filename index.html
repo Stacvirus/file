@@ -2,28 +2,43 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>PDF Renamer</title>
+    <title>PDF Renamer (XML Version)</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container">
-    <h1>PDF Renamer</h1>
+    <h1>PDF Renamer with XML Support</h1>
 
     <div class="file-section">
-        <h2>Step 1: Select PDF File</h2>
-        <button id="select-pdf" class="btn">Select PDF</button>
-        <p>Selected file: <span id="pdf-path">None</span></p>
+        <h2>Step 1: Select PDF Files</h2>
+        <button id="select-pdfs" class="btn">Select PDF Files</button>
+        <div id="pdf-paths" class="file-paths-container">
+            <span class="text-muted">None</span>
+        </div>
     </div>
 
     <div class="file-section">
-        <h2>Step 2: Select Text File with New Name</h2>
-        <button id="select-txt" class="btn">Select Text File</button>
-        <p>Selected file: <span id="txt-path">None</span></p>
+        <h2>Step 2: Select XML File with Document Information</h2>
+        <button id="select-xml" class="btn">Select XML File</button>
+        <p>Selected file: <span id="xml-path" class="file-path">None</span></p>
+    </div>
+
+    <div class="info-section">
+        <div class="info">
+            <h3>How it works:</h3>
+            <p>The app will:</p>
+            <ol>
+                <li>Find each PDF in the XML document</li>
+                <li>Look for the index with name="Bemerkung"</li>
+                <li>Use its value as the new filename</li>
+                <li>Create a copy of each PDF with its new name</li>
+            </ol>
+        </div>
     </div>
 
     <div class="action-section">
-        <h2>Step 3: Rename the PDF</h2>
-        <button id="rename-btn" class="btn primary" disabled>Rename PDF</button>
+        <h2>Step 3: Rename the PDFs</h2>
+        <button id="rename-btn" class="btn primary" disabled>Rename PDFs</button>
     </div>
 
     <div id="result" class="result-section"></div>

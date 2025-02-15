@@ -25,7 +25,17 @@ h2 {
     color: #34495e;
 }
 
-.file-section, .action-section {
+h3 {
+    font-size: 1.1em;
+    margin-top: 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin-bottom: 0.5em;
+}
+
+.file-section, .action-section, .info-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid #eee;
@@ -65,9 +75,56 @@ h2 {
     background-color: #95a5a6;
 }
 
-#pdf-path, #txt-path {
+.file-path, .text-muted {
     font-family: monospace;
     word-break: break-all;
+    color: #666;
+}
+
+.file-paths-container {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.file-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list li {
+    font-family: monospace;
+    word-break: break-all;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.file-list li:last-child {
+    border-bottom: none;
+}
+
+.file-count {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.info {
+    background-color: #edf7fd;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.info ol {
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding-left: 20px;
 }
 
 .result-section {
@@ -77,13 +134,27 @@ h2 {
 .success {
     background-color: #e6f7e9;
     border-left: 4px solid #2ecc71;
-    padding: 10px;
+    padding: 15px;
     border-radius: 4px;
 }
 
 .error {
     background-color: #fae9e8;
     border-left: 4px solid #e74c3c;
-    padding: 10px;
+    padding: 15px;
     border-radius: 4px;
+}
+
+.result-list, .error-list {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.result-list li, .error-list li {
+    margin-bottom: 5px;
+}
+
+.error-list li {
+    color: #c0392b;
 }
