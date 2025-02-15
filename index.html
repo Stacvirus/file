@@ -7,38 +7,42 @@
 </head>
 <body>
 <div class="container">
-    <h1>PDF Renamer</h1>
+    <div class="language-switcher">
+        <button id="language-toggle" class="btn secondary">Switch to German</button>
+    </div>
+
+    <h1 id="app-title">PDF Renamer</h1>
 
     <div class="file-section">
-        <h2>Step 1: Select PDF Files</h2>
+        <h2 id="step1-title">Step 1: Select PDF Files</h2>
         <button id="select-pdfs" class="btn">Select PDF Files</button>
         <button id="clear-selection" class="btn secondary">Clear Selection</button>
         <div id="pdf-paths" class="file-paths-container">
-            <span class="text-muted">None</span>
+            <span class="text-muted" id="none-text">None</span>
         </div>
     </div>
 
     <div class="file-section">
-        <h2>Step 2: Select XML File with Document Information</h2>
+        <h2 id="step2-title">Step 2: Select XML File with Document Information</h2>
         <button id="select-xml" class="btn">Select XML File</button>
-        <p>Selected file: <span id="xml-path" class="file-path">None</span></p>
+        <p><span id="selected-file-text">Selected file:</span> <span id="xml-path" class="file-path">None</span></p>
     </div>
 
     <div class="info-section">
         <div class="info">
-            <h3>How it works:</h3>
-            <p>The app will:</p>
+            <h3 id="how-it-works">How it works:</h3>
+            <p id="app-will">The app will:</p>
             <ol>
-                <li>Find each PDF in the XML document</li>
-                <li>Look for the index with name="Bemerkung"</li>
-                <li>Use its value as the new filename</li>
-                <li>Create a copy of each PDF with its new name</li>
+                <li id="step1-detail">Find each PDF in the XML document</li>
+                <li id="step2-detail">Look for the index with name="Bemerkung"</li>
+                <li id="step3-detail">Use its value as the new filename</li>
+                <li id="step4-detail">Create a copy of each PDF with its new name</li>
             </ol>
         </div>
     </div>
 
     <div class="action-section">
-        <h2>Step 3: Rename the PDFs</h2>
+        <h2 id="step3-title">Step 3: Rename the PDFs</h2>
         <button id="rename-btn" class="btn primary" disabled>Rename PDFs</button>
     </div>
 

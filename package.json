@@ -54,7 +54,7 @@
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "PDFRenamer",
-            "authors": "Your Name",
+            "authors": "Yaakyi LTD",
             "setupIcon": "./icons/icon.ico"
           }
         },

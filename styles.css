@@ -166,3 +166,17 @@ h4 {
 .btn.secondary:hover {
     background-color: #7f8c8d;
 }
+
+.language-switcher {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.btn.secondary {
+    background-color: #95a5a6;
+    margin-left: 10px;
+}
+
+.btn.secondary:hover {
+    background-color: #7f8c8d;
+}

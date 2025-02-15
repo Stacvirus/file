@@ -1,10 +1,33 @@
 if (require('electron-squirrel-startup')) return;
 
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 const { XMLParser } = require('fast-xml-parser');
+
+const translations = {
+    en: {
+        successMessage: "Processed {count} files successfully",
+        errorMessage: "Error processing files: {error}",
+        noDocumentsFound: "Invalid XML structure: no documents found",
+        documentEntryNotFound: "Could not find document entry for {fileName} in the XML file",
+        noIndexesFound: "No indexes found in the document for {fileName}",
+        bemerkungIndexNotFound: 'Index with name "Bemerkung" not found for {fileName}',
+        noValidNameFound: "No valid name found in the Bemerkung index for {fileName}",
+        fileCopyError: "Error copying {fileName}: {error}"
+    },
+    de: {
+        successMessage: "{count} Dateien erfolgreich verarbeitet",
+        errorMessage: "Fehler beim Verarbeiten der Dateien: {error}",
+        noDocumentsFound: "Ungültige XML-Struktur: Keine Dokumente gefunden",
+        documentEntryNotFound: "Dokumenteintrag für {fileName} in der XML-Datei nicht gefunden",
+        noIndexesFound: "Keine Indizes im Dokument für {fileName} gefunden",
+        bemerkungIndexNotFound: 'Index mit dem Namen "Bemerkung" für {fileName} nicht gefunden',
+        noValidNameFound: "Kein gültiger Name im Bemerkung-Index für {fileName} gefunden",
+        fileCopyError: "Fehler beim Kopieren von {fileName}: {error}"
+    }
+};
 
 // Keep a global reference of the window object to avoid it being garbage collected
 let mainWindow;
@@ -21,11 +44,13 @@ function createWindow() {
         }
     });
 
+    Menu.setApplicationMenu(null); // remove the menu bar
+
     // Load the index.html file
     mainWindow.loadFile('index.html');
 
     // Open DevTools in development (comment out for production)
-    // mainWindow.webContents.openDevTools();
+     mainWindow.webContents.openDevTools();
 
     // Handle window being closed
     mainWindow.on('closed', () => {
@@ -77,7 +102,7 @@ ipcMain.handle('select-xml', async () => {
 });
 
 // Handle the renaming process for multiple PDFs
-ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
+ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
     try {
         // Read the XML file
         const xmlData = fs.readFileSync(xmlPath, 'utf8');
@@ -91,7 +116,11 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
 
         // Check if documents array exists
         if (!jsonObj.documents || !jsonObj.documents.document) {
-            return { success: false, message: 'Invalid XML structure: no documents found' };
+            return {
+                success: false,
+                message: translations[lang].noDocumentsFound,
+                errors: [translations[lang].noDocumentsFound]
+            };
         }
 
         // Ensure we have an array of documents even if there's only one
@@ -101,6 +130,17 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
 
         const results = [];
         const errors = [];
+
+        // Get the directory of the first PDF file (assuming all PDFs are in the same directory)
+        const baseDir = path.dirname(pdfPaths[0]);
+
+        // Create a new directory for renamed files
+        const renamedDir = path.join(baseDir, 'renamed_files');
+
+        // Ensure the directory exists
+        if (!fs.existsSync(renamedDir)) {
+            fs.mkdirSync(renamedDir);
+        }
 
         // Process each PDF file
         for (const pdfPath of pdfPaths) {
@@ -121,13 +161,13 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
             });
 
             if (!targetDocument) {
-                errors.push(`Could not find document entry for ${pdfBaseName} in the XML file`);
+                errors.push(translations[lang].documentEntryNotFound.replace('{fileName}', pdfBaseName));
                 continue;
             }
 
             // Find the Bemerkung index in the document
             if (!targetDocument.indexes || !targetDocument.indexes.index) {
-                errors.push(`No indexes found in the document for ${pdfBaseName}`);
+                errors.push(translations[lang].noIndexesFound.replace('{fileName}', pdfBaseName));
                 continue;
             }
 
@@ -138,7 +178,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
             const targetIndex = indexes.find(idx => idx['@_name'] === 'Bemerkung');
 
             if (!targetIndex) {
-                errors.push(`Index with name "Bemerkung" not found for ${pdfBaseName}`);
+                errors.push(translations[lang].bemerkungIndexNotFound.replace('{fileName}', pdfBaseName));
                 continue;
             }
 
@@ -154,19 +194,18 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
             }
 
             if (!newName) {
-                errors.push(`No valid name found in the Bemerkung index for ${pdfBaseName}`);
+                errors.push(translations[lang].noValidNameFound.replace('{fileName}', pdfBaseName));
                 continue;
             }
 
             // Clean the new name to be valid for a filename (basic cleaning)
             newName = newName.replace(/[/\\?%*:|"<>]/g, '-');
 
-            // Get directory and extension of the original PDF
-            const pdfDir = path.dirname(pdfPath);
+            // Get extension of the original PDF
             const pdfExt = path.extname(pdfPath);
 
-            // Create new path with the new name
-            const newPath = path.join(pdfDir, newName + pdfExt);
+            // Create new path in the renamed_files directory
+            const newPath = path.join(renamedDir, newName + pdfExt);
 
             try {
                 // Copy the file to the new path
@@ -179,7 +218,9 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
                     newName: newName + pdfExt
                 });
             } catch (err) {
-                errors.push(`Error copying ${pdfBaseName}: ${err.message}`);
+                errors.push(translations[lang].fileCopyError
+                    .replace('{fileName}', pdfBaseName)
+                    .replace('{error}', err.message));
             }
         }
 
@@ -187,14 +228,14 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath) => {
             success: results.length > 0,
             results: results,
             errors: errors,
-            message: `Processed ${results.length} files successfully` +
-                (errors.length > 0 ? ` with ${errors.length} errors` : '')
+            message: translations[lang].successMessage.replace('{count}', results.length) +
+                (errors.length > 0 ? ` ${translations[lang].errorMessage.replace('{error}', errors.length)}` : '')
         };
     } catch (error) {
         return {
             success: false,
-            message: `Error processing files: ${error.message}`,
-            errors: [error.message]
+            message: translations[lang].errorMessage.replace('{error}', error.message),
+            errors: [translations[lang].errorMessage.replace('{error}', error.message)]
         };
     }
 });

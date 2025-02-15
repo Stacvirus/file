@@ -4,5 +4,5 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electron', {
     selectPdfs: () => ipcRenderer.invoke('select-pdfs'),
     selectXml: () => ipcRenderer.invoke('select-xml'),
-    renamePdfs: (pdfPaths, xmlPath) => ipcRenderer.invoke('rename-pdfs', pdfPaths, xmlPath)
+    renamePdfs: (pdfPaths, xmlPath, lang) => ipcRenderer.invoke('rename-pdfs', pdfPaths, xmlPath, lang)
 });
