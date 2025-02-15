@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 const { XMLParser } = require('fast-xml-parser');
+const logger = require('./logger'); // Import the logger
 
 const translations = {
     en: {
@@ -44,18 +45,21 @@ function createWindow() {
         }
     });
 
-    Menu.setApplicationMenu(null); // remove the menu bar
+    Menu.setApplicationMenu(null); // Remove the menu bar
 
     // Load the index.html file
     mainWindow.loadFile('index.html');
 
     // Open DevTools in development (comment out for production)
-     mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     // Handle window being closed
     mainWindow.on('closed', () => {
         mainWindow = null;
+        logger.info('Main window closed');
     });
+
+    logger.info('Application started');
 }
 
 // Create window when Electron is ready
@@ -66,6 +70,7 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
+    logger.info('Application closed');
 });
 
 app.on('activate', () => {
@@ -83,8 +88,10 @@ ipcMain.handle('select-pdfs', async () => {
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
+        logger.info(`Selected PDF files: ${result.filePaths.join(', ')}`);
         return result.filePaths;
     }
+    logger.info('No PDF files selected');
     return [];
 });
 
@@ -96,14 +103,18 @@ ipcMain.handle('select-xml', async () => {
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
+        logger.info(`Selected XML file: ${result.filePaths[0]}`);
         return result.filePaths[0];
     }
+    logger.info('No XML file selected');
     return null;
 });
 
 // Handle the renaming process for multiple PDFs
 ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
     try {
+        logger.info('Starting PDF renaming process');
+
         // Read the XML file
         const xmlData = fs.readFileSync(xmlPath, 'utf8');
 
@@ -116,11 +127,9 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
 
         // Check if documents array exists
         if (!jsonObj.documents || !jsonObj.documents.document) {
-            return {
-                success: false,
-                message: translations[lang].noDocumentsFound,
-                errors: [translations[lang].noDocumentsFound]
-            };
+            const message = translations[lang].noDocumentsFound;
+            logger.error(message);
+            return { success: false, message, errors: [message] };
         }
 
         // Ensure we have an array of documents even if there's only one
@@ -140,12 +149,13 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
         // Ensure the directory exists
         if (!fs.existsSync(renamedDir)) {
             fs.mkdirSync(renamedDir);
+            logger.info(`Created directory: ${renamedDir}`);
         }
 
         // Process each PDF file
         for (const pdfPath of pdfPaths) {
-            // Get the base name of the PDF (without directory path)
             const pdfBaseName = path.basename(pdfPath);
+            logger.info(`Processing file: ${pdfBaseName}`);
 
             // Find the document that contains our PDF file
             const targetDocument = documents.find(doc => {
@@ -161,13 +171,17 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
             });
 
             if (!targetDocument) {
-                errors.push(translations[lang].documentEntryNotFound.replace('{fileName}', pdfBaseName));
+                const message = translations[lang].documentEntryNotFound.replace('{fileName}', pdfBaseName);
+                errors.push(message);
+                logger.error(message);
                 continue;
             }
 
             // Find the Bemerkung index in the document
             if (!targetDocument.indexes || !targetDocument.indexes.index) {
-                errors.push(translations[lang].noIndexesFound.replace('{fileName}', pdfBaseName));
+                const message = translations[lang].noIndexesFound.replace('{fileName}', pdfBaseName);
+                errors.push(message);
+                logger.error(message);
                 continue;
             }
 
@@ -178,7 +192,9 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
             const targetIndex = indexes.find(idx => idx['@_name'] === 'Bemerkung');
 
             if (!targetIndex) {
-                errors.push(translations[lang].bemerkungIndexNotFound.replace('{fileName}', pdfBaseName));
+                const message = translations[lang].bemerkungIndexNotFound.replace('{fileName}', pdfBaseName);
+                errors.push(message);
+                logger.error(message);
                 continue;
             }
 
@@ -194,7 +210,9 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
             }
 
             if (!newName) {
-                errors.push(translations[lang].noValidNameFound.replace('{fileName}', pdfBaseName));
+                const message = translations[lang].noValidNameFound.replace('{fileName}', pdfBaseName);
+                errors.push(message);
+                logger.error(message);
                 continue;
             }
 
@@ -210,6 +228,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
             try {
                 // Copy the file to the new path
                 await fsExtra.copy(pdfPath, newPath);
+                logger.info(`Renamed file: ${pdfBaseName} → ${newName + pdfExt}`);
 
                 results.push({
                     oldPath: pdfPath,
@@ -218,24 +237,31 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
                     newName: newName + pdfExt
                 });
             } catch (err) {
-                errors.push(translations[lang].fileCopyError
+                const message = translations[lang].fileCopyError
                     .replace('{fileName}', pdfBaseName)
-                    .replace('{error}', err.message));
+                    .replace('{error}', err.message);
+                errors.push(message);
+                logger.error(message);
             }
         }
+
+        const successMessage = translations[lang].successMessage.replace('{count}', results.length) +
+            (errors.length > 0 ? ` ${translations[lang].errorMessage.replace('{error}', errors.length)}` : '');
+        logger.info(successMessage);
 
         return {
             success: results.length > 0,
             results: results,
             errors: errors,
-            message: translations[lang].successMessage.replace('{count}', results.length) +
-                (errors.length > 0 ? ` ${translations[lang].errorMessage.replace('{error}', errors.length)}` : '')
+            message: successMessage
         };
     } catch (error) {
+        const message = translations[lang].errorMessage.replace('{error}', error.message);
+        logger.error(message);
         return {
             success: false,
-            message: translations[lang].errorMessage.replace('{error}', error.message),
-            errors: [translations[lang].errorMessage.replace('{error}', error.message)]
+            message: message,
+            errors: [message]
         };
     }
 });
