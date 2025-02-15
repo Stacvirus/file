@@ -1,33 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Renamer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container">
+    <!-- Language Switcher -->
     <div class="language-switcher">
         <button id="language-toggle" class="btn secondary">Switch to German</button>
     </div>
 
+    <!-- App Title -->
     <h1 id="app-title">PDF Renamer</h1>
 
+    <!-- Step 1: Select PDF Files -->
     <div class="file-section">
         <h2 id="step1-title">Step 1: Select PDF Files</h2>
-        <button id="select-pdfs" class="btn">Select PDF Files</button>
-        <button id="clear-selection" class="btn secondary">Clear Selection</button>
+        <div class="button-group">
+            <button id="select-pdfs" class="btn">Select PDF Files</button>
+            <button id="clear-selection" class="btn secondary">Clear Selection</button>
+        </div>
         <div id="pdf-paths" class="file-paths-container">
             <span class="text-muted" id="none-text">None</span>
         </div>
     </div>
 
+    <!-- Step 2: Select XML File -->
     <div class="file-section">
         <h2 id="step2-title">Step 2: Select XML File with Document Information</h2>
         <button id="select-xml" class="btn">Select XML File</button>
         <p><span id="selected-file-text">Selected file:</span> <span id="xml-path" class="file-path">None</span></p>
     </div>
 
+    <!-- How It Works Section -->
     <div class="info-section">
         <div class="info">
             <h3 id="how-it-works">How it works:</h3>
@@ -41,11 +49,13 @@
         </div>
     </div>
 
+    <!-- Step 3: Rename PDFs -->
     <div class="action-section">
         <h2 id="step3-title">Step 3: Rename the PDFs</h2>
         <button id="rename-btn" class="btn primary" disabled>Rename PDFs</button>
     </div>
 
+    <!-- Results Section -->
     <div id="result" class="result-section"></div>
 </div>
 
