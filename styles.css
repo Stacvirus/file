@@ -1,0 +1,89 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+h2 {
+    font-size: 1.2em;
+    color: #34495e;
+}
+
+.file-section, .action-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+.btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.btn.primary {
+    background-color: #2ecc71;
+    font-size: 16px;
+    padding: 10px 20px;
+}
+
+.btn.primary:hover {
+    background-color: #27ae60;
+}
+
+.btn.primary:disabled {
+    background-color: #95a5a6;
+}
+
+#pdf-path, #txt-path {
+    font-family: monospace;
+    word-break: break-all;
+}
+
+.result-section {
+    margin-top: 20px;
+}
+
+.success {
+    background-color: #e6f7e9;
+    border-left: 4px solid #2ecc71;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.error {
+    background-color: #fae9e8;
+    border-left: 4px solid #e74c3c;
+    padding: 10px;
+    border-radius: 4px;
+}

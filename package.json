@@ -1,0 +1,27 @@
+{
+  "name": "file",
+  "version": "1.0.0",
+  "description": "A simple Electron app to rename PDF files based on names in and xml files",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stacvirus/file.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Stacvirus/file/issues"
+  },
+  "homepage": "https://github.com/Stacvirus/file#readme",
+  "devDependencies": {
+    "electron": "^34.2.0"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.0"
+  }
+}
