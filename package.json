@@ -4,8 +4,13 @@
   "description": "A simple Electron app to rename PDF files based on names in and xml files",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "electron .",
+    "start": "electron-forge start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make-win": "electron-forge make --platform win32",
+    "make-mac": "electron-forge make --platform darwin"
   },
   "repository": {
     "type": "git",
@@ -19,11 +24,56 @@
   },
   "homepage": "https://github.com/Stacvirus/file#readme",
   "devDependencies": {
+    "@electron-forge/cli": "^7.6.1",
+    "@electron-forge/maker-deb": "^7.6.1",
+    "@electron-forge/maker-dmg": "^7.6.1",
+    "@electron-forge/maker-rpm": "^7.6.1",
+    "@electron-forge/maker-squirrel": "^7.6.1",
+    "@electron-forge/maker-zip": "^7.6.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.6.1",
+    "@electron-forge/plugin-fuses": "^7.6.1",
+    "@electron/fuses": "^1.8.0",
     "electron": "^34.2.0"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
     "fast-xml-parser": "^4.5.1",
     "fs-extra": "^11.3.0",
     "path": "^0.12.7"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "./icons/icon",
+        "executableName": "PDFRenamer",
+        "appBundleId": "com.yaakyi.pdfrenamer",
+        "asar": true
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "PDFRenamer",
+            "authors": "Your Name",
+            "setupIcon": "./icons/icon.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin",
+            "win32"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "icon": "./icons/icon.icns",
+            "background": "./assets/dmg-background.png",
+            "format": "ULFO"
+          }
+        }
+      ]
+    }
   }
 }
