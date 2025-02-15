@@ -13,7 +13,8 @@ const resultElement = document.getElementById('result');
 selectPdfsBtn.addEventListener('click', async () => {
     const paths = await window.electron.selectPdfs();
     if (paths && paths.length > 0) {
-        selectedPdfPaths = paths;
+        // Add new paths to the existing selection
+        selectedPdfPaths = [...new Set([...selectedPdfPaths, ...paths])];
         updatePdfPathsList();
         checkEnableRenameButton();
     }
@@ -107,3 +108,13 @@ function checkEnableRenameButton() {
 // Initialize
 updatePdfPathsList();
 checkEnableRenameButton();
+
+// Add clear selection button functionality
+const clearSelectionBtn = document.getElementById('clear-selection');
+if (clearSelectionBtn) {
+    clearSelectionBtn.addEventListener('click', () => {
+        selectedPdfPaths = [];
+        updatePdfPathsList();
+        checkEnableRenameButton();
+    });
+}

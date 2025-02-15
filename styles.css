@@ -158,3 +158,11 @@ h4 {
 .error-list li {
     color: #c0392b;
 }
+.btn.secondary {
+    background-color: #95a5a6;
+    margin-left: 10px;
+}
+
+.btn.secondary:hover {
+    background-color: #7f8c8d;
+}
