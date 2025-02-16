@@ -9,7 +9,7 @@ if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir);
 }
 
-// Configure Pino logger
+// Configure Pino logger with timestamp and level display
 const logger = pino({
     level: 'info', // Minimum log level to capture
     transport: {
@@ -18,7 +18,20 @@ const logger = pino({
             destination: path.join(logsDir, 'app.log'),
             mkdir: true,
         }
-    }
+    },
+    formatters: {
+        level: (label) => {
+            return { level: label.toUpperCase() };
+        },
+        time: () => {
+            const now = new Date();
+            return {
+                time: now.toISOString(),
+                formattedTime: now.toLocaleString()
+            };
+        }
+    },
+    timestamp: () => `,"time":"${new Date().toISOString()}"`,
 });
 
 module.exports = logger;
