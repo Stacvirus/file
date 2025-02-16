@@ -3,62 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Renamer</title>
+    <title>Tagleser</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-    <!-- Language Switcher -->
-    <div class="language-switcher">
-        <button id="language-toggle" class="btn secondary">Switch to German</button>
-    </div>
-
-    <!-- App Title -->
-    <h1 id="app-title">PDF Renamer</h1>
-
-    <!-- Step 1: Select PDF Files -->
-    <div class="file-section">
-        <h2 id="step1-title">Step 1: Select PDF Files</h2>
-        <div class="button-group">
-            <button id="select-pdfs" class="btn">Select PDF Files</button>
-            <button id="clear-selection" class="btn secondary">Clear Selection</button>
+<div class="app-container">
+    <header class="app-header">
+        <div class="logo animate__animated animate__fadeIn">
+            <div class="logo-icon">PDF</div>
+            <h1 id="app-title">Tagleser</h1>
         </div>
-        <div id="pdf-paths" class="file-paths-container">
-            <span class="text-muted" id="none-text">None</span>
-        </div>
-    </div>
+        <button id="language-toggle" class="language-switcher animate__animated animate__fadeIn">
+            Switch to German
+        </button>
+    </header>
 
-    <!-- Step 2: Select XML File -->
-    <div class="file-section">
-        <h2 id="step2-title">Step 2: Select XML File with Document Information</h2>
-        <button id="select-xml" class="btn">Select XML File</button>
-        <p><span id="selected-file-text">Selected file:</span> <span id="xml-path" class="file-path">None</span></p>
-    </div>
+    <div class="workspace">
+        <aside class="sidebar animate__animated animate__fadeInLeft">
+            <div class="sidebar-section">
+                <h2 id="step1-title">Step 1: Select PDF Files</h2>
+                <div class="button-group">
+                    <button id="select-pdfs" class="btn primary">Select PDF Files</button>
+                    <button id="clear-selection" class="btn">Clear Selection</button>
+                </div>
+            </div>
 
-    <!-- How It Works Section -->
-    <div class="info-section">
-        <div class="info">
-            <h3 id="how-it-works">How it works:</h3>
-            <p id="app-will">The app will:</p>
-            <ol>
-                <li id="step1-detail">Find each PDF in the XML document</li>
-                <li id="step2-detail">Look for the index with name="Bemerkung"</li>
-                <li id="step3-detail">Use its value as the new filename</li>
-                <li id="step4-detail">Create a copy of each PDF with its new name</li>
-            </ol>
-        </div>
-    </div>
+            <div class="sidebar-section">
+                <h2 id="step2-title">Step 2: Select XML File with Document Information</h2>
+                <button id="select-xml" class="btn primary">Select XML File</button>
+                <p class="file-path-display">
+                    <span id="selected-file-text">Selected file:</span>
+                    <span id="xml-path" class="file-path">None</span>
+                </p>
+            </div>
 
-    <!-- Step 3: Rename PDFs -->
-    <div class="action-section">
-        <h2 id="step3-title">Step 3: Rename the PDFs</h2>
-        <button id="rename-btn" class="btn primary" disabled>Rename PDFs</button>
-    </div>
+            <div class="sidebar-section">
+                <h2 id="step3-title">Step 3: Rename the PDFs</h2>
+                <button id="rename-btn" class="btn primary" disabled>Rename PDFs</button>
+            </div>
+        </aside>
 
-    <!-- Results Section -->
-    <div id="result" class="result-section"></div>
+        <main class="main-content animate__animated animate__fadeIn">
+            <!-- Background particles -->
+            <div class="particles">
+                <div class="particle" style="width: 10px; height: 10px; left: 10%; top: 20%; animation-duration: 25s;"></div>
+                <div class="particle" style="width: 15px; height: 15px; left: 30%; top: 40%; animation-duration: 20s;"></div>
+                <div class="particle" style="width: 20px; height: 20px; left: 50%; top: 10%; animation-duration: 22s;"></div>
+                <div class="particle" style="width: 12px; height: 12px; left: 70%; top: 30%; animation-duration: 18s;"></div>
+                <div class="particle" style="width: 8px; height: 8px; left: 85%; top: 60%; animation-duration: 30s;"></div>
+            </div>
+
+            <div class="file-manager">
+                <div class="file-manager-header">
+                    <h3 class="file-manager-title">Selected PDF Files</h3>
+                </div>
+                <div class="file-paths-container">
+                    <div id="pdf-paths">
+                        <span class="text-muted">None</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3 id="how-it-works" class="info-title">How it works:</h3>
+                <h4 id="app-will" class="info-subtitle">The app will:</h4>
+                <ol>
+                    <li id="step1-detail">Find each PDF in the XML document</li>
+                    <li id="step2-detail">Look for the index with name="Bemerkung"</li>
+                    <li id="step3-detail">Use its value as the new filename</li>
+                    <li id="step4-detail">Create a copy of each PDF with its new name</li>
+                </ol>
+            </div>
+
+            <div id="result" class="result-section"></div>
+        </main>
+    </div>
 </div>
 
+<script>
+    // Particle animation
+    document.addEventListener('DOMContentLoaded', () => {
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach(particle => {
+            const randomLeft = Math.random() * 100;
+            const randomTop = Math.random() * 100;
+            const size = 5 + Math.random() * 20;
+            const duration = 15 + Math.random() * 20;
+
+            particle.style.left = `${randomLeft}%`;
+            particle.style.top = `${randomTop}%`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.animationDuration = `${duration}s`;
+        });
+    });
+</script>
 <script src="renderer.js"></script>
 </body>
 </html>

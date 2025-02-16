@@ -14,11 +14,11 @@ const languageToggleBtn = document.getElementById('language-toggle');
 
 const translations = {
     en: {
-        title: "PDF Renamer",
+        title: "Tagleser",
         step1: "Step 1: Select PDF Files",
         selectPdfs: "Select PDF Files",
         clearSelection: "Clear Selection",
-        step2: "Step 2: Select XML File with Document Information",
+        step2: "Step 2: Select XML File",
         selectXml: "Select XML File",
         selectedFile: "Selected file:",
         none: "None",
@@ -38,11 +38,11 @@ const translations = {
         switchToEnglish: "Switch to English"
     },
     de: {
-        title: "PDF-Umbenenner",
+        title: "Tagleser",
         step1: "Schritt 1: PDF-Dateien auswählen",
         selectPdfs: "PDF-Dateien auswählen",
         clearSelection: "Auswahl aufheben",
-        step2: "Schritt 2: XML-Datei mit Dokumentinformationen auswählen",
+        step2: "Schritt 2: XML-Datei mit",
         selectXml: "XML-Datei auswählen",
         selectedFile: "Ausgewählte Datei:",
         none: "Keine",
