@@ -11,12 +11,14 @@ const renameBtn = document.getElementById('rename-btn');
 const resultElement = document.getElementById('result');
 const clearSelectionBtn = document.getElementById('clear-selection');
 const languageToggleBtn = document.getElementById('language-toggle');
+const managerHeaderTitle = document.querySelector('.file-manager-title');
 
 const translations = {
     en: {
         title: "Tagleser",
         step1: "Step 1: Select PDF Files",
         selectPdfs: "Select PDF Files",
+        selectedPdfs: "Selected PDF Files",
         clearSelection: "Clear Selection",
         step2: "Step 2: Select XML File",
         selectXml: "Select XML File",
@@ -34,13 +36,14 @@ const translations = {
         successTitle: "Successfully renamed files:",
         errorsTitle: "Errors:",
         filesSelected: "file(s) selected",
-        switchToGerman: "Switch to German",
-        switchToEnglish: "Switch to English"
+        switchToGerman: "Zu Deutsch wechseln",
+        switchToEnglish: "Zu Englisch wechseln"
     },
     de: {
         title: "Tagleser",
         step1: "Schritt 1: PDF-Dateien auswählen",
         selectPdfs: "PDF-Dateien auswählen",
+        selectedPdfs: "Ausgewählte PDF-Dateien",
         clearSelection: "Auswahl aufheben",
         step2: "Schritt 2: XML-Datei mit",
         selectXml: "XML-Datei auswählen",
@@ -58,8 +61,8 @@ const translations = {
         successTitle: "Erfolgreich umbenannte Dateien:",
         errorsTitle: "Fehler:",
         filesSelected: "Datei(en) ausgewählt",
-        switchToGerman: "Zu Deutsch wechseln",
-        switchToEnglish: "Zu Englisch wechseln"
+        switchToGerman: "Switch to German",
+        switchToEnglish: "Switch to English"
     }
 };
 
@@ -84,6 +87,7 @@ function updateLanguage(lang) {
     document.getElementById('step4-detail').textContent = t.step4Detail;
     document.getElementById('step3-title').textContent = t.step3;
     renameBtn.textContent = t.renamePdfs;
+    managerHeaderTitle.textContent = t.selectedPdfs;
 
     // Toggle button text
     languageToggleBtn.textContent = lang === 'en' ? t.switchToGerman : t.switchToEnglish;
