@@ -46,15 +46,15 @@
     "forge": {
       "packagerConfig": {
         "icon": "./icons/icon",
-        "executableName": "PDFRenamer",
-        "appBundleId": "com.yaakyi.pdfrenamer",
+        "executableName": "Tagleser",
+        "appBundleId": "com.yaakyi.Tagleser",
         "asar": true
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "PDFRenamer",
+            "name": "Tagleser",
             "authors": "Yaakyi LTD",
             "setupIcon": "./icons/icon.ico"
           }
