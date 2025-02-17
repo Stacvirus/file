@@ -5,7 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 const { XMLParser } = require('fast-xml-parser');
-const logger = require('./logger'); // Import the logger
+const logger = require('./logger');
+const iconv = require('iconv-lite');
 
 const translations = {
     en: {
@@ -117,17 +118,26 @@ ipcMain.handle('select-xml', async () => {
 });
 
 // Handle the renaming process for multiple PDFs
-ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
+ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOriginals) => {
     try {
         logger.info('Starting PDF renaming process');
 
         // Read the XML file
-        const xmlData = fs.readFileSync(xmlPath, 'utf8');
+        //const xmlData = fs.readFileSync(xmlPath, { encoding: 'utf8' });
+        const xmlBuffer = fs.readFileSync(xmlPath);
+        const xmlData = iconv.decode(xmlBuffer, 'utf-8');
 
         // Parse XML with options to preserve attributes
         const parser = new XMLParser({
             ignoreAttributes: false,
-            attributeNamePrefix: "@_"
+            attributeNamePrefix: "@_",
+            trimValues: true,
+            cdataTagName: "__cdata",
+            cdataPositionChar: "\\c",
+            parseAttributeValue: false,
+            parseTagValue: true,
+            processEntities: true, // Ensure XML entities like &amp; are processed
+            decodeHTMLchar: true
         });
         const jsonObj = parser.parse(xmlData);
 
@@ -236,11 +246,21 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
                 await fsExtra.copy(pdfPath, newPath);
                 logger.info(`Renamed file: ${pdfBaseName} → ${newName + pdfExt}`);
 
+                if (deleteOriginals) {
+                    try {
+                        await fsExtra.remove(pdfPath);
+                        logger.info(`Deleted original file: ${pdfBaseName}`);
+                    } catch (deleteErr) {
+                        logger.error(`Error deleting original file ${pdfBaseName}: ${deleteErr.message}`);
+                    }
+                }
+
                 results.push({
                     oldPath: pdfPath,
                     newPath: newPath,
                     oldName: pdfBaseName,
-                    newName: newName + pdfExt
+                    newName: newName + pdfExt,
+                    deleted: deleteOriginals
                 });
             } catch (err) {
                 const message = translations[lang].fileCopyError

@@ -1,6 +1,7 @@
 let selectedPdfPaths = [];
 let selectedXmlPath = null;
-let currentLang = 'en';
+let currentLang = 'de';
+let deleteOriginals = false;
 
 // Elements
 const pdfPathsElement = document.getElementById('pdf-paths');
@@ -34,6 +35,8 @@ const translations = {
         switchToEnglish: "Zu Englisch wechseln",
         filesRenamed: "files renamed successfully",
         filesFailed: "files failed to rename",
+        deleteOriginals: "Delete original files after renaming",
+        filesDeleted: "original files deleted"
     },
     de: {
         title: "Tagleser",
@@ -55,6 +58,8 @@ const translations = {
         switchToEnglish: "Switch to English",
         filesRenamed: "Dateien erfolgreich umbenannt",
         filesFailed: "Dateien konnten nicht umbenannt werden",
+        deleteOriginals: "Originaldateien nach dem Umbenennen löschen",
+        filesDeleted: "Originaldateien gelöscht",
     }
 };
 
@@ -77,6 +82,7 @@ function updateLanguage(lang) {
 
     // Toggle button text
     languageToggleBtn.textContent = lang === 'en' ? t.switchToGerman : t.switchToEnglish;
+    document.getElementById('delete-originals-label').textContent = translations[lang].deleteOriginals;
 
     // Update "None" text if no files are selected
     if (selectedPdfPaths.length === 0) {
@@ -89,6 +95,10 @@ function updateLanguage(lang) {
     // Update file count if files are selected
     updatePdfPathsList();
 }
+
+document.getElementById('delete-originals').addEventListener('change', (e) => {
+    deleteOriginals = e.target.checked;
+});
 
 // Event listeners
 selectPdfsBtn.addEventListener('click', async () => {
@@ -133,7 +143,8 @@ renameBtn.addEventListener('click', async () => {
         const result = await window.electron.renamePdfs(
             pdfFullPaths,
             selectedXmlPath.fullPath,
-            currentLang
+            currentLang,
+            deleteOriginals
         );
 
         const resultContainer = document.createElement('div');
@@ -144,6 +155,7 @@ renameBtn.addEventListener('click', async () => {
             successDiv.innerHTML = `
                 <h3>${t.successTitle}</h3>
                 <p>${result.results.length} ${t.filesRenamed}</p>
+                ${deleteOriginals ? `<p>${result.results.length} ${t.filesDeleted}</p>` : ''}
             `;
             resultContainer.appendChild(successDiv);
         }
