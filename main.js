@@ -36,8 +36,10 @@ let mainWindow;
 function createWindow() {
     // Create the browser window
     mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 750,
+        width: 1280,
+        height: 800,
+        minWidth: 1024,
+        minHeight: 768,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -88,14 +90,16 @@ ipcMain.handle('select-pdfs', async () => {
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
-        logger.info(`Selected PDF files: ${result.filePaths.join(', ')}`);
-        return result.filePaths;
+        return result.filePaths.map(filePath => ({
+            fullPath: filePath,
+            fileName: path.basename(filePath)
+        }));
     }
     logger.info('No PDF files selected');
     return [];
 });
 
-// Handle XML file selection
+// Handle xml file selection
 ipcMain.handle('select-xml', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
@@ -103,8 +107,10 @@ ipcMain.handle('select-xml', async () => {
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
-        logger.info(`Selected XML file: ${result.filePaths[0]}`);
-        return result.filePaths[0];
+        return {
+            fullPath: result.filePaths[0],
+            fileName: path.basename(result.filePaths[0])
+        };
     }
     logger.info('No XML file selected');
     return null;

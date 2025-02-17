@@ -16,21 +16,15 @@ const managerHeaderTitle = document.querySelector('.file-manager-title');
 const translations = {
     en: {
         title: "Tagleser",
-        step1: "Step 1: Select PDF Files",
+        step1: "Select PDF Files",
         selectPdfs: "Select PDF Files",
         selectedPdfs: "Selected PDF Files",
         clearSelection: "Clear Selection",
-        step2: "Step 2: Select XML File",
+        step2: "Select XML File",
         selectXml: "Select XML File",
         selectedFile: "Selected file:",
         none: "None",
-        howItWorks: "How it works:",
-        appWill: "The app will:",
-        step1Detail: "Find each PDF in the XML document",
-        step2Detail: "Look for the index with name=\"Bemerkung\"",
-        step3Detail: "Use its value as the new filename",
-        step4Detail: "Create a copy of each PDF with its new name",
-        step3: "Step 3: Rename the PDFs",
+        step3: "Rename the PDFs",
         renamePdfs: "Rename PDFs",
         processing: "Processing...",
         successTitle: "Successfully renamed files:",
@@ -41,21 +35,15 @@ const translations = {
     },
     de: {
         title: "Tagleser",
-        step1: "Schritt 1: PDF-Dateien auswählen",
+        step1: "PDF-Dateien auswählen",
         selectPdfs: "PDF-Dateien auswählen",
         selectedPdfs: "Ausgewählte PDF-Dateien",
         clearSelection: "Auswahl aufheben",
-        step2: "Schritt 2: XML-Datei mit",
+        step2: "XML-Datei mit",
         selectXml: "XML-Datei auswählen",
         selectedFile: "Ausgewählte Datei:",
         none: "Keine",
-        howItWorks: "Wie es funktioniert:",
-        appWill: "Die App wird:",
-        step1Detail: "Jede PDF im XML-Dokument finden",
-        step2Detail: "Nach dem Index mit name=\"Bemerkung\" suchen",
-        step3Detail: "Seinen Wert als neuen Dateinamen verwenden",
-        step4Detail: "Eine Kopie jeder PDF mit ihrem neuen Namen erstellen",
-        step3: "Schritt 3: PDFs umbenennen",
+        step3: "PDFs umbenennen",
         renamePdfs: "PDFs umbenennen",
         processing: "Verarbeitung...",
         successTitle: "Erfolgreich umbenannte Dateien:",
@@ -79,12 +67,6 @@ function updateLanguage(lang) {
     document.getElementById('step2-title').textContent = t.step2;
     selectXmlBtn.textContent = t.selectXml;
     document.getElementById('selected-file-text').textContent = t.selectedFile;
-    document.getElementById('how-it-works').textContent = t.howItWorks;
-    document.getElementById('app-will').textContent = t.appWill;
-    document.getElementById('step1-detail').textContent = t.step1Detail;
-    document.getElementById('step2-detail').textContent = t.step2Detail;
-    document.getElementById('step3-detail').textContent = t.step3Detail;
-    document.getElementById('step4-detail').textContent = t.step4Detail;
     document.getElementById('step3-title').textContent = t.step3;
     renameBtn.textContent = t.renamePdfs;
     managerHeaderTitle.textContent = t.selectedPdfs;
@@ -106,19 +88,19 @@ function updateLanguage(lang) {
 
 // Event listeners
 selectPdfsBtn.addEventListener('click', async () => {
-    const paths = await window.electron.selectPdfs();
-    if (paths && paths.length > 0) {
-        selectedPdfPaths = [...new Set([...selectedPdfPaths, ...paths])];
+    const files = await window.electron.selectPdfs();
+    if (files && files.length > 0) {
+        selectedPdfPaths = [...new Set([...selectedPdfPaths, ...files])];
         updatePdfPathsList();
         checkEnableRenameButton();
     }
 });
 
 selectXmlBtn.addEventListener('click', async () => {
-    const path = await window.electron.selectXml();
-    if (path) {
-        selectedXmlPath = path;
-        xmlPathElement.textContent = path;
+    const file = await window.electron.selectXml();
+    if (file) {
+        selectedXmlPath = file;
+        xmlPathElement.textContent = file.fileName;
         checkEnableRenameButton();
     }
 });
@@ -140,7 +122,14 @@ renameBtn.addEventListener('click', async () => {
         renameBtn.disabled = true;
         renameBtn.textContent = t.processing;
 
-        const result = await window.electron.renamePdfs(selectedPdfPaths, selectedXmlPath, currentLang);
+        // Extract full paths for the rename operation
+        const pdfFullPaths = selectedPdfPaths.map(file => file.fullPath);
+
+        const result = await window.electron.renamePdfs(
+            pdfFullPaths,
+            selectedXmlPath.fullPath,
+            currentLang
+        );
 
         if (result.success) {
             let successHtml = `
@@ -200,8 +189,8 @@ function updatePdfPathsList() {
     }
 
     let html = '<ul class="file-list">';
-    selectedPdfPaths.forEach(path => {
-        html += `<li>${path}</li>`;
+    selectedPdfPaths.forEach(file => {
+        html += `<li>${file.fileName}</li>`;
     });
     html += '</ul>';
     html += `<p class="file-count">${selectedPdfPaths.length} ${t.filesSelected}</p>`;
