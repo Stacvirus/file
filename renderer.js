@@ -113,6 +113,7 @@ clearSelectionBtn.addEventListener('click', () => {
     selectedPdfPaths = [];
     updatePdfPathsList();
     checkEnableRenameButton();
+    resultElement.innerHTML = '';
 });
 
 languageToggleBtn.addEventListener('click', () => {
@@ -191,6 +192,6 @@ function checkEnableRenameButton() {
 }
 
 // Initialize
-updateLanguage('en');
+updateLanguage('de');
 updatePdfPathsList();
 checkEnableRenameButton();
