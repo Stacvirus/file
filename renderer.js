@@ -31,7 +31,9 @@ const translations = {
         errorsTitle: "Errors:",
         filesSelected: "file(s) selected",
         switchToGerman: "Zu Deutsch wechseln",
-        switchToEnglish: "Zu Englisch wechseln"
+        switchToEnglish: "Zu Englisch wechseln",
+        filesRenamed: "files renamed successfully",
+        filesFailed: "files failed to rename",
     },
     de: {
         title: "Tagleser",
@@ -50,7 +52,9 @@ const translations = {
         errorsTitle: "Fehler:",
         filesSelected: "Datei(en) ausgewählt",
         switchToGerman: "Switch to German",
-        switchToEnglish: "Switch to English"
+        switchToEnglish: "Switch to English",
+        filesRenamed: "Dateien erfolgreich umbenannt",
+        filesFailed: "Dateien konnten nicht umbenannt werden",
     }
 };
 
@@ -131,49 +135,33 @@ renameBtn.addEventListener('click', async () => {
             currentLang
         );
 
-        if (result.success) {
-            let successHtml = `
-        <div class="success">
-          <h3>${result.message}</h3>
-          <h4>${t.successTitle}</h4>
-          <ul class="result-list">
-      `;
+        const resultContainer = document.createElement('div');
 
-            result.results.forEach(item => {
-                successHtml += `
-          <li>
-            <strong>${item.oldName}</strong> → <strong>${item.newName}</strong>
-          </li>
-        `;
-            });
-
-            successHtml += `</ul>`;
-
-            if (result.errors.length > 0) {
-                successHtml += `
-          <h4>${t.errorsTitle}</h4>
-          <ul class="error-list">
-        `;
-
-                result.errors.forEach(error => {
-                    successHtml += `<li>${error}</li>`;
-                });
-
-                successHtml += `</ul>`;
-            }
-
-            successHtml += `</div>`;
-            resultElement.innerHTML = successHtml;
-        } else {
-            resultElement.innerHTML = `
-        <div class="error">
-          <h3>${result.message}</h3>
-          <ul class="error-list">
-            ${result.errors.map(err => `<li>${err}</li>`).join('')}
-          </ul>
-        </div>
-      `;
+        if (result.results && result.results.length > 0) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.innerHTML = `
+                <h3>${t.successTitle}</h3>
+                <p>${result.results.length} ${t.filesRenamed}</p>
+            `;
+            resultContainer.appendChild(successDiv);
         }
+
+        if (result.errors && result.errors.length > 0) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.innerHTML = `
+                <h3>${t.errorsTitle}</h3>
+                <p>${result.errors.length} ${t.filesFailed}</p>
+                <ul class="error-list">
+                    ${result.errors.map(filename => `<li>${filename}</li>`).join('')}
+                </ul>
+            `;
+            resultContainer.appendChild(errorDiv);
+        }
+
+        resultElement.innerHTML = '';
+        resultElement.appendChild(resultContainer);
 
         renameBtn.disabled = false;
         renameBtn.textContent = t.renamePdfs;

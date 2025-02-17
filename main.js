@@ -178,7 +178,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
 
             if (!targetDocument) {
                 const message = translations[lang].documentEntryNotFound.replace('{fileName}', pdfBaseName);
-                errors.push(message);
+                errors.push(pdfBaseName);
                 logger.error(message);
                 continue;
             }
@@ -186,7 +186,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
             // Find the Bemerkung index in the document
             if (!targetDocument.indexes || !targetDocument.indexes.index) {
                 const message = translations[lang].noIndexesFound.replace('{fileName}', pdfBaseName);
-                errors.push(message);
+                errors.push(pdfBaseName);
                 logger.error(message);
                 continue;
             }
@@ -199,7 +199,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
 
             if (!targetIndex) {
                 const message = translations[lang].bemerkungIndexNotFound.replace('{fileName}', pdfBaseName);
-                errors.push(message);
+                errors.push(pdfBaseName);
                 logger.error(message);
                 continue;
             }
@@ -217,7 +217,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang) => {
 
             if (!newName) {
                 const message = translations[lang].noValidNameFound.replace('{fileName}', pdfBaseName);
-                errors.push(message);
+                errors.push(pdfBaseName);
                 logger.error(message);
                 continue;
             }

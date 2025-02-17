@@ -231,7 +231,7 @@ h2 {
     border-radius: 8px;
     border: 1px solid var(--border);
     padding: 1rem;
-    height: 200px; /* Fixed height */
+    height: 200px;
     min-height: 200px;
     max-height: 200px;
     overflow-y: auto;
