@@ -17,9 +17,9 @@ const translations = {
     en: {
         title: "Tagleser",
         step1: "Select PDF Files",
-        selectPdfs: "Select PDF Files",
+        selectPdfs: "Select PDFs",
         selectedPdfs: "Selected PDF Files",
-        clearSelection: "Clear Selection",
+        clearSelection: "Clear",
         step2: "Select XML File",
         selectXml: "Select XML File",
         selectedFile: "Selected file:",
@@ -38,9 +38,9 @@ const translations = {
     de: {
         title: "Tagleser",
         step1: "PDF-Dateien auswählen",
-        selectPdfs: "PDF-Dateien auswählen",
+        selectPdfs: "PDFs auswählen",
         selectedPdfs: "Ausgewählte PDF-Dateien",
-        clearSelection: "Auswahl aufheben",
+        clearSelection: "Leeren",
         step2: "XML-Datei mit",
         selectXml: "XML-Datei auswählen",
         selectedFile: "Ausgewählte Datei:",

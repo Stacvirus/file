@@ -109,12 +109,41 @@ h2 {
     min-height: 600px; /* Fixed minimum height */
     overflow-y: auto;
     width: 100%;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1); /* For Firefox */
+    padding-right: calc(1.5rem - 8px)
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 8px 0; /* Add some space at top and bottom */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 8px;
+    border: 2px solid var(--card-bg); /* Creates padding effect */
+    min-height: 40px; /* Minimum thumb size */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-dark);
 }
 
 .sidebar-section {
     margin-bottom: 2rem;
-    min-height: 120px; /* Minimum height for each section */
+    min-height: 120px;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-right: 8px;
 }
 
 .sidebar-section:last-child {
@@ -185,6 +214,7 @@ h2 {
 .button-group {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
 .btn {
@@ -195,13 +225,16 @@ h2 {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
+    display: inline-flex; /* Changed to inline-flex */
     align-items: center;
+    justify-content: center; /* Added to center content */
     gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
+    padding: 0 1.25rem; /* Changed padding to horizontal only */
     font-size: var(--font-size-small);
-    height: auto;
+    height: 40px; /* Fixed height */
     min-width: 140px;
+    white-space: nowrap; /* Prevent text wrapping inside button */
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .btn.primary {
@@ -469,6 +502,15 @@ h2 {
 
     .result-section {
         margin-top: 1.5rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
     }
 }
 
