@@ -3,10 +3,16 @@ const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+const appRootDir = process.cwd();
+const logsDir = path.join(appRootDir, 'logs');
+
 // Ensure the logs directory exists
-const logsDir = path.join(app.getPath('userData'), 'logs');
 if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir);
+    try {
+        fs.mkdirSync(logsDir, { recursive: true });
+    } catch (error) {
+        console.error('Failed to create logs directory:', error);
+    }
 }
 
 // Configure Pino logger with timestamp and level display
@@ -32,6 +38,15 @@ const logger = pino({
         }
     },
     timestamp: () => `,"time":"${new Date().toISOString()}"`,
+});
+
+logger.info({
+    event: 'app_start',
+    appPath: appRootDir,
+    logsPath: logsDir,
+    electronVersion: process.versions.electron,
+    nodeVersion: process.versions.node,
+    platform: process.platform
 });
 
 module.exports = logger;
