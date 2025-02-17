@@ -155,18 +155,19 @@ h2 {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     position: relative;
     height: 100%;
-    min-height: 600px; /* Fixed minimum height */
+    min-height: 600px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .file-manager {
     margin-bottom: 2rem;
-    flex: 1;
-    min-height: 250px; /* Fixed minimum height */
-    max-height: 300px; /* Maximum height */
+    min-height: 250px;
+    max-height: 300px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .file-manager-header {
@@ -237,6 +238,7 @@ h2 {
     margin-top: 1rem;
     position: relative;
     z-index: 1;
+    padding-right: 1rem;
 }
 
 .file-list {
@@ -291,12 +293,40 @@ h2 {
 .result-section {
     margin-top: 2rem;
     font-size: var(--font-size-small);
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Take remaining space */
+    padding-right: 1rem;
+}
+
+.file-paths-container::-webkit-scrollbar,
+.result-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.file-paths-container::-webkit-scrollbar-track,
+.result-section::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.file-paths-container::-webkit-scrollbar-thumb,
+.result-section::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for scrollbar thumb */
+.file-paths-container::-webkit-scrollbar-thumb:hover,
+.result-section::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
 }
 
 .success, .error {
     border-radius: 8px;
     padding: 1.5rem;
     animation: fadeIn 0.5s ease;
+    margin-bottom: 1rem; /* Add space between multiple messages */
 }
 
 .success {
@@ -315,10 +345,12 @@ h2 {
 
 .result-list, .error-list {
     margin-left: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .result-list li, .error-list li {
     margin-bottom: 0.5rem;
+    line-height: 1.4;
 }
 
 .text-muted {
@@ -424,6 +456,19 @@ h2 {
 
     .file-paths-container {
         height: 150px;
+    }
+
+    .main-content {
+        min-height: 500px; /* Slightly reduced for mobile */
+    }
+
+    .file-manager {
+        min-height: 200px;
+        max-height: 250px;
+    }
+
+    .result-section {
+        margin-top: 1.5rem;
     }
 }
 
