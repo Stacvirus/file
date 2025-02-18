@@ -35,7 +35,7 @@ const translations = {
         switchToEnglish: `<img src="./assets/united-kingdom.png"  alt="the england flag"/>`,
         filesRenamed: "files renamed successfully",
         filesFailed: "files failed to rename",
-        deleteOriginals: "Delete original files after renaming",
+        deleteOriginals: "Delete original files",
         filesDeleted: "original files deleted"
     },
     de: {
@@ -58,7 +58,7 @@ const translations = {
         switchToEnglish: `<img src="./assets/united-kingdom.png"  alt="the german flag"/>`,
         filesRenamed: "Dateien erfolgreich umbenannt",
         filesFailed: "Dateien konnten nicht umbenannt werden",
-        deleteOriginals: "Originaldateien nach dem Umbenennen löschen",
+        deleteOriginals: "Original Dateien löschen",
         filesDeleted: "Originaldateien gelöscht",
     }
 };
