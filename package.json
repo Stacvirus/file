@@ -1,6 +1,6 @@
 {
   "name": "file",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A simple Electron app to rename PDF files based on names in and xml files",
   "main": "main.js",
   "scripts": {
@@ -50,7 +50,9 @@
         "icon": "./icons/icon",
         "executableName": "Tagleser",
         "appBundleId": "com.yaakyi.Tagleser",
-        "asar": true
+        "asar": {
+          "unpack": "**/*.node"
+        }
       },
       "makers": [
         {
