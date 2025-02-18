@@ -117,17 +117,22 @@ ipcMain.handle('select-xml', async () => {
     return null;
 });
 
+const INDEX_NAMES = [
+    'Organisationseinheit',
+    'Bemerkung',
+    'Belegnummernkreis',
+    'Buchungsbelegnummer',
+    'Rechnung-Nr'
+];
+
 // Handle the renaming process for multiple PDFs
 ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOriginals) => {
     try {
         logger.info('Starting PDF renaming process');
 
-        // Read the XML file
-        //const xmlData = fs.readFileSync(xmlPath, { encoding: 'utf8' });
         const xmlBuffer = fs.readFileSync(xmlPath);
         const xmlData = iconv.decode(xmlBuffer, 'utf-8');
 
-        // Parse XML with options to preserve attributes
         const parser = new XMLParser({
             ignoreAttributes: false,
             attributeNamePrefix: "@_",
@@ -136,19 +141,17 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
             cdataPositionChar: "\\c",
             parseAttributeValue: false,
             parseTagValue: true,
-            processEntities: true, // Ensure XML entities like &amp; are processed
+            processEntities: true,
             decodeHTMLchar: true
         });
         const jsonObj = parser.parse(xmlData);
 
-        // Check if documents array exists
         if (!jsonObj.documents || !jsonObj.documents.document) {
             const message = translations[lang].noDocumentsFound;
             logger.error(message);
             return { success: false, message, errors: [message] };
         }
 
-        // Ensure we have an array of documents even if there's only one
         const documents = Array.isArray(jsonObj.documents.document)
             ? jsonObj.documents.document
             : [jsonObj.documents.document];
@@ -156,33 +159,24 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
         const results = [];
         const errors = [];
 
-        // Get the directory of the first PDF file (assuming all PDFs are in the same directory)
         const baseDir = path.dirname(pdfPaths[0]);
-
-        // Create a new directory for renamed files
         const renamedDir = path.join(baseDir, 'renamed_files');
 
-        // Ensure the directory exists
         if (!fs.existsSync(renamedDir)) {
             fs.mkdirSync(renamedDir);
             logger.info(`Created directory: ${renamedDir}`);
         }
 
-        // Process each PDF file
         for (const pdfPath of pdfPaths) {
             const pdfBaseName = path.basename(pdfPath);
             logger.info(`Processing file: ${pdfBaseName}`);
 
-            // Find the document that contains our PDF file
             const targetDocument = documents.find(doc => {
                 if (!doc.file) return false;
-
-                // Extract filename from the file path in XML
                 const xmlFilePath = doc.file;
                 const xmlFileName = xmlFilePath.includes('\\')
                     ? xmlFilePath.split('\\').pop()
                     : xmlFilePath;
-
                 return xmlFileName === pdfBaseName;
             });
 
@@ -193,7 +187,6 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
                 continue;
             }
 
-            // Find the Bemerkung index in the document
             if (!targetDocument.indexes || !targetDocument.indexes.index) {
                 const message = translations[lang].noIndexesFound.replace('{fileName}', pdfBaseName);
                 errors.push(pdfBaseName);
@@ -205,44 +198,36 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
                 ? targetDocument.indexes.index
                 : [targetDocument.indexes.index];
 
-            const targetIndex = indexes.find(idx => idx['@_name'] === 'Bemerkung');
-
-            if (!targetIndex) {
-                const message = translations[lang].bemerkungIndexNotFound.replace('{fileName}', pdfBaseName);
-                errors.push(pdfBaseName);
-                logger.error(message);
-                continue;
-            }
-
-            // Get the value from the index
-            let newName;
-            if (targetIndex.value) {
-                if (Array.isArray(targetIndex.value)) {
-                    // If there are multiple values, use the first one
-                    newName = targetIndex.value[0];
-                } else {
-                    newName = targetIndex.value;
+            // Collect values for all required indexes
+            const indexValues = [];
+            for (const indexName of INDEX_NAMES) {
+                const targetIndex = indexes.find(idx => idx['@_name'] === indexName);
+                if (targetIndex && targetIndex.value) {
+                    const value = Array.isArray(targetIndex.value)
+                        ? targetIndex.value[0]
+                        : targetIndex.value;
+                    if (value) {
+                        indexValues.push(value.toString().trim());
+                    }
                 }
+                // Don't add empty placeholder if index not found - skip it
             }
 
-            if (!newName) {
+            if (indexValues.length === 0) {
                 const message = translations[lang].noValidNameFound.replace('{fileName}', pdfBaseName);
                 errors.push(pdfBaseName);
                 logger.error(message);
                 continue;
             }
 
-            // Clean the new name to be valid for a filename (basic cleaning)
-            newName = newName.replace(/[/\\?%*:|"<>]/g, '-');
+            // Combine all found values with underscores
+            const newName = indexValues.join('_')
+                .replace(/[/\\?%*:|"<>]/g, '-');
 
-            // Get extension of the original PDF
             const pdfExt = path.extname(pdfPath);
-
-            // Create new path in the renamed_files directory
             const newPath = path.join(renamedDir, newName + pdfExt);
 
             try {
-                // Copy the file to the new path
                 await fsExtra.copy(pdfPath, newPath);
                 logger.info(`Renamed file: ${pdfBaseName} → ${newName + pdfExt}`);
 
@@ -260,7 +245,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
                     newPath: newPath,
                     oldName: pdfBaseName,
                     newName: newName + pdfExt,
-                    deleted: deleteOriginals
+                    deleted: deleteOriginals && !fs.existsSync(pdfPath)
                 });
             } catch (err) {
                 const message = translations[lang].fileCopyError
