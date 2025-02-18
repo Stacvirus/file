@@ -131,7 +131,7 @@ ipcMain.handle('rename-pdfs', async (event, pdfPaths, xmlPath, lang, deleteOrigi
         logger.info('Starting PDF renaming process');
 
         const xmlBuffer = fs.readFileSync(xmlPath);
-        const xmlData = iconv.decode(xmlBuffer, 'utf-8');
+        const xmlData = iconv.decode(xmlBuffer, 'iso-8859-1');
 
         const parser = new XMLParser({
             ignoreAttributes: false,
