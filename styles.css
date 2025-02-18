@@ -43,6 +43,10 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .logo {
@@ -545,4 +549,35 @@ h2 {
     cursor: pointer;
     font-size: var(--font-size-small);
     user-select: none;
+}
+
+#language-toggle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px; /* Adjust width as needed */
+    height: 40px; /* Adjust height as needed */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#language-toggle:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+#language-toggle img {
+    width: 50%;
+    height: 50%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+#language-toggle:hover img {
+    opacity: 0.8; /* Slightly fade the image on hover */
 }

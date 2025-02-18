@@ -31,8 +31,8 @@ const translations = {
         successTitle: "Successfully renamed files:",
         errorsTitle: "Errors:",
         filesSelected: "file(s) selected",
-        switchToGerman: "Zu Deutsch wechseln",
-        switchToEnglish: "Zu Englisch wechseln",
+        switchToGerman: `<img src="./assets/german.png"  alt="the german flag"/>`,
+        switchToEnglish: `<img src="./assets/united-kingdom.png"  alt="the england flag"/>`,
         filesRenamed: "files renamed successfully",
         filesFailed: "files failed to rename",
         deleteOriginals: "Delete original files after renaming",
@@ -54,8 +54,8 @@ const translations = {
         successTitle: "Erfolgreich umbenannte Dateien:",
         errorsTitle: "Fehler:",
         filesSelected: "Datei(en) ausgewählt",
-        switchToGerman: "Switch to German",
-        switchToEnglish: "Switch to English",
+        switchToGerman: `<img src="./assets/german.png"  alt="the german flag"/>`,
+        switchToEnglish: `<img src="./assets/united-kingdom.png"  alt="the german flag"/>`,
         filesRenamed: "Dateien erfolgreich umbenannt",
         filesFailed: "Dateien konnten nicht umbenannt werden",
         deleteOriginals: "Originaldateien nach dem Umbenennen löschen",
@@ -81,7 +81,7 @@ function updateLanguage(lang) {
     managerHeaderTitle.textContent = t.selectedPdfs;
 
     // Toggle button text
-    languageToggleBtn.textContent = lang === 'en' ? t.switchToGerman : t.switchToEnglish;
+    languageToggleBtn.innerHTML = lang === 'en' ? t.switchToGerman : t.switchToEnglish;
     document.getElementById('delete-originals-label').textContent = translations[lang].deleteOriginals;
 
     // Update "None" text if no files are selected
@@ -98,6 +98,21 @@ function updateLanguage(lang) {
 
 document.getElementById('delete-originals').addEventListener('change', (e) => {
     deleteOriginals = e.target.checked;
+});
+
+languageToggleBtn.addEventListener('click', () => {
+    const newLang = currentLang === 'en' ? 'de' : 'en';
+    updateLanguage(newLang);
+
+    // Update the flag image based on the new language
+    const flagImage = languageToggleBtn.querySelector('img');
+    if (newLang === 'en') {
+        flagImage.src = './assets/german.png';
+        flagImage.alt = 'German Flag';
+    } else {
+        flagImage.src = './assets/united-kingdom.png';
+        flagImage.alt = 'English Flag';
+    }
 });
 
 // Event listeners
@@ -119,16 +134,12 @@ selectXmlBtn.addEventListener('click', async () => {
     }
 });
 
-clearSelectionBtn.addEventListener('click', () => {
+clearSelectionBtn.addEventListener('click', async () => {
+    await window.electron.clearPdfs();
     selectedPdfPaths = [];
     updatePdfPathsList();
     checkEnableRenameButton();
     resultElement.innerHTML = '';
-});
-
-languageToggleBtn.addEventListener('click', () => {
-    const newLang = currentLang === 'en' ? 'de' : 'en';
-    updateLanguage(newLang);
 });
 
 renameBtn.addEventListener('click', async () => {

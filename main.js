@@ -84,6 +84,7 @@ app.on('activate', () => {
 });
 
 // Handle PDF file selection - now with multiSelections
+let selectedPdfPaths = new Set();
 ipcMain.handle('select-pdfs', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile', 'multiSelections'],
@@ -91,13 +92,36 @@ ipcMain.handle('select-pdfs', async () => {
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
-        return result.filePaths.map(filePath => ({
-            fullPath: filePath,
-            fileName: path.basename(filePath)
-        }));
+        const newPdfs = [];
+        const duplicates = [];
+
+        for (const filePath of result.filePaths) {
+            if (selectedPdfPaths.has(filePath)) {
+                duplicates.push(path.basename(filePath));
+            } else {
+                selectedPdfPaths.add(filePath);
+                newPdfs.push({
+                    fullPath: filePath,
+                    fileName: path.basename(filePath)
+                });
+            }
+        }
+
+        // Optionally notify about duplicates
+        if (duplicates.length > 0) {
+            logger.info(`Skipped duplicate PDFs: ${duplicates.join(', ')}`);
+        }
+
+        return newPdfs;
     }
     logger.info('No PDF files selected');
     return [];
+});
+
+ipcMain.handle('clear-pdfs', () => {
+    selectedPdfPaths.clear();
+    logger.info('Cleared selected PDFs');
+    return true;
 });
 
 // Handle xml file selection
